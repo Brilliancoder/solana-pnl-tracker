@@ -1,0 +1,13 @@
+{
+  "name": "solana-pnl-tracker",
+  "version": "1.0.0",
+  "description": "Solana wallet PnL tracker: realized profit, open positions and win rate for any wallet's memecoin trades, computed from on-chain transactions.",
+  "type": "module",
+  "bin": { "pnl": "bin/pnl.js" },
+  "scripts": { "start": "node bin/pnl.js", "test": "node --test" },
+  "engines": { "node": ">=22" },
+  "keywords": ["solana", "pnl", "pnl-tracker", "wallet-pnl", "profit-and-loss", "memecoin", "pump-fun", "wallet-analyzer", "trading-stats", "on-chain"],
+  "homepage": "https://blixvip.com/solana-pnl-tracker",
+  "repository": { "type": "git", "url": "git+https://github.com/blixtrade/solana-pnl-tracker.git" },
+  "license": "MIT"
+}
