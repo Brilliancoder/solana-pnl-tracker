@@ -53,7 +53,7 @@ main(async () => {
   const [info, solPrice] = await Promise.all([tokenInfo(mints), solUsd()]);
   const prices = new Map();
   for (const [mint, t] of info) if (t?.priceUsd && solPrice) prices.set(mint, t.priceUsd / solPrice);
-  const result = computePnl(trades, { prices, solUsd: solPrice });
+  const result = computePnl([...trades].reverse(), { prices, solUsd: solPrice });
   for (const r of result.rows) r.symbol = info.get(r.mint)?.symbol || null;
   const span = { from: sigs.at(-1).blockTime * 1000, to: sigs[0].blockTime * 1000 };
 

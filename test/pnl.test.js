@@ -59,3 +59,35 @@ test("open positions without a price are flagged, and losers lower the win rate"
   assert.equal(rows[0].mint, "B");
   near(totals.realized, 0.2);
 });
+
+test("a sell before any buy in the window is unmatched, and a later buy stays open", () => {
+  // tokens from before the window are sold for 5 SOL, then 100 are bought back for 1 SOL
+  const { rows, totals } = computePnl([sell("A", 100, 5), buy("A", 100, 1)], { prices: new Map([["A", 0.01]]) });
+  near(rows[0].realized, 0);
+  near(rows[0].unmatched, 5);
+  assert.equal(rows[0].roi, null);
+  assert.equal(rows[0].open, 100);
+  near(rows[0].openCost, 1);
+  near(rows[0].openValue, 1);
+  assert.equal(totals.closed, 0);
+  assert.equal(totals.winRate, null);
+});
+
+test("trades are replayed in time order, whatever order they are passed in", () => {
+  // buy 100 for 1, sell 100 for 3, then buy 50 again for 2 (newest first, as the RPC lists them)
+  const trades = [buy("A", 100, 1), sell("A", 100, 3), buy("A", 50, 2)].reverse();
+  const { rows } = computePnl(trades);
+  near(rows[0].realized, 2);
+  near(rows[0].roi, 200);
+  assert.equal(rows[0].open, 50);
+  near(rows[0].openCost, 2);
+});
+
+test("a sell only matches tokens still held after earlier sells", () => {
+  // buy 100 for 1, sell 100 for 2, sell 100 more (from before the window) for 4, buy 100 for 3
+  const { rows } = computePnl([buy("A", 100, 1), sell("A", 100, 2), sell("A", 100, 4), buy("A", 100, 3)]);
+  near(rows[0].realized, 1);
+  near(rows[0].unmatched, 4);
+  assert.equal(rows[0].open, 100);
+  near(rows[0].openCost, 3);
+});
